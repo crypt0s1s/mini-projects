@@ -17,8 +17,10 @@ import './index.css';
 //     }
 //   }
   function Square(props) {
+    let css = "square " + props.selected;
+    
     return (
-      <button className="square" onClick={props.onClick}>
+      <button className={css} onClick={props.onClick}>
         {props.value}
       </button>
     );
@@ -29,45 +31,82 @@ import './index.css';
     renderSquare(i) {
       return <Square 
         value={this.props.squares[i]}
+        selected={i === 0 ? "selected" : ""}
         onClick={() => this.props.onClick(i)} 
       />;
+    }
+
+    renderRow(startIndex) {
+        return <div>
+                {this.squares(startIndex).map(i => this.renderSquare(i))}
+            </div>
     }
 
     render() {
       return (
         <div>
-            <div className="board-row">
-                {this.renderSquare(0)}
-                {this.renderSquare(1)}
-                {this.renderSquare(2)}
-                {this.renderSquare(2)}
-                {this.renderSquare(2)}
-                {this.renderSquare(2)}
-                {this.renderSquare(2)}
-                {this.renderSquare(2)}
-                {this.renderSquare(2)}
-            </div>
-            <div className="board-row">
-                {this.renderSquare(3)}
-                {this.renderSquare(4)}
-                {this.renderSquare(5)}
-            </div>
-            <div className="board-row">
-                {this.renderSquare(6)}
-                {this.renderSquare(7)}
-                {this.renderSquare(8)}
-            </div>
+            {this.rows().map( r => this.renderRow(r))}
         </div>
+        //     <div className="board-row">
+
+        //         {this.renderSquare(0)}
+        //         {this.renderSquare(1)}
+        //         {this.renderSquare(2)}
+        //         {this.renderSquare(3)}
+        //         {this.renderSquare(4)}
+        //         {this.renderSquare(5)}
+        //         {this.renderSquare(6)}
+        //         {this.renderSquare(7)}
+        //         {this.renderSquare(8)}
+        //     </div>
+        //     <div className="board-row">
+        //         {this.renderSquare(10)}
+        //         {this.renderSquare(11)}
+        //         {this.renderSquare(12)}
+        //     </div>
+        //     <div className="board-row">
+        //         {this.renderSquare(20)}
+        //         {this.renderSquare(7)}
+        //         {this.renderSquare(8)}
+        //     </div>
+        // </div>
       );
+    }
+
+    rows() {
+        let result = [];
+        for (var i = 0; i < 81; i += 9) {
+            result.push(i);
+        }
+        return result;
+    }
+
+    squares(startIndex) {
+        let result = [];
+        for (var i = 0; i < 9; i++) {
+            result.push(startIndex + i);
+        }
+        return result;
     }
   }
   
+  class NewGame extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { clickHandler: props.onNewGame }
+    }  
+
+    render() {
+        return <button onClick={this.state.clickHandler}>New Game</button>;
+    }
+  }
+
   class Game extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             history: [{
-                squares: Array(9).fill(null),
+                squares: Array(81).fill(null),
             }],
             stepNumber: 0,
             xIsNext: true,
@@ -134,10 +173,18 @@ import './index.css';
                 </div>
                 <div className="game-info">
                     <div>{status}</div>
+                    <NewGame onNewGame={() => this.newGame()}/>
                     <ol>{moves}</ol>
                 </div>
             </div>
         );
+    }
+    
+    newGame() {
+        this.setState({
+            stepNumber: 0,
+            xIsNext: true,
+        });
     }
   }
   
